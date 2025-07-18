@@ -2,62 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Leo 老师儿童英语练习</title>
+  <title>Leo 老师儿童英语练习（自动朗读）</title>
   <style>
     body {
       font-family: sans-serif;
-      margin: 0;
-      padding: 0;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
       text-align: center;
     }
     h2 {
-      padding: 20px;
       color: #2a5d84;
     }
-    iframe {
-      width: 100%;
-      height: 80vh;
-      min-height: 500px;
-      border: none;
-    }
-    .speak-area {
-      margin: 20px;
-    }
-    input {
+    input, button {
+      font-size: 1.2em;
       padding: 10px;
-      font-size: 1em;
-      width: 60%;
+      margin-top: 10px;
+      width: 90%;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 1em;
-      margin-left: 10px;
+    #replyText {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #007b7b;
     }
   </style>
 </head>
 <body>
 
-  <h2>🍎 Leo 老师英语对话练习</h2>
+  <h2>🍎 Which fruit is red?</h2>
+  <p>请孩子说一句英语（例如：The apple is red.）</p>
 
-  <div class="speak-area">
-    <input type="text" id="ttsInput" placeholder="复制 AI 回复粘贴到这里">
-    <button onclick="speak()">🔊 朗读</button>
-  </div>
+  <input type="text" id="childInput" placeholder="请输入孩子说的话">
+  <br>
+  <button onclick="sendToLeo()">提交</button>
 
-  <iframe
-    src="https://udify.app/chatbot/2wCOGybT3Qdh0qlE"
-    allow="microphone">
-  </iframe>
+  <div id="replyText">等待 AI 回复…</div>
 
   <script>
-    function speak() {
-      const text = document.getElementById("ttsInput").value.trim();
-      if (text !== "") {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        utterance.rate = 0.95;
-        utterance.pitch = 1.1;
-        speechSynthesis.speak(utterance);
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.1;
+      speechSynthesis.speak(utterance);
+    }
+
+    async function sendToLeo() {
+      const input = document.getElementById("childInput").value.trim();
+      const replyDiv = document.getElementById("replyText");
+
+      if (!input) {
+        replyDiv.textContent = "⚠️ 请输入孩子说的话";
+        return;
+      }
+
+      replyDiv.textContent = "🤖 正在回复中，请稍等…";
+
+      try {
+        const response = await fetch("https://api.dify.ai/v1/chat-messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sk-app-DxVbbKQfLYQ3jFpK4lwF3Zr7"  // ✅ 替换为你自己的 Dify API Key
+          },
+          body: JSON.stringify({
+            app_id: "app-2wCOGybT3Qdh0qlE",  // ✅ 你的 App ID
+            inputs: {
+              question: "Which fruit is red?",
+              child_answer: input
+            },
+            response_mode: "blocking"
+          })
+        });
+
+        const data = await response.json();
+        const reply = data.answer || "Sorry, I didn't understand. Try again!";
+        replyDiv.textContent = reply;
+        speak(reply); // ✅ 自动朗读
+      } catch (error) {
+        replyDiv.textContent = "❌ 出错了，请检查网络或 API 设置。";
+        console.error(error);
       }
     }
   </script>
