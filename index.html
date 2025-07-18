@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leo 老师儿童英语练习</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    h2 {
+      padding: 20px;
+      color: #2a5d84;
+    }
+    iframe {
+      width: 100%;
+      height: 80vh;
+      min-height: 500px;
+      border: none;
+    }
+    .speak-area {
+      margin: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 1em;
+      width: 60%;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🍎 Leo 老师英语对话练习</h2>
+
+  <div class="speak-area">
+    <input type="text" id="ttsInput" placeholder="复制 AI 回复粘贴到这里">
+    <button onclick="speak()">🔊 朗读</button>
+  </div>
+
+  <iframe
+    src="https://udify.app/chatbot/2wCOGybT3Qdh0qlE"
+    allow="microphone">
+  </iframe>
+
+  <script>
+    function speak() {
+      const text = document.getElementById("ttsInput").value.trim();
+      if (text !== "") {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 0.95;
+        utterance.pitch = 1.1;
+        speechSynthesis.speak(utterance);
+      }
+    }
+  </script>
+
+</body>
+</html>
